@@ -1,8 +1,32 @@
 {
   "$schema": "https://json.schemastore.org/nest-cli",
   "collection": "@nestjs/schematics",
-  "sourceRoot": "src",
+  "sourceRoot": "apps/simplyerp/src",
   "compilerOptions": {
-    "deleteOutDir": true
+    "deleteOutDir": true,
+    "webpack": true,
+    "tsConfigPath": "apps/simplyerp/tsconfig.app.json"
+  },
+  "monorepo": true,
+  "root": "apps/simplyerp",
+  "projects": {
+    "simplyerp": {
+      "type": "application",
+      "root": "apps/simplyerp",
+      "entryFile": "main",
+      "sourceRoot": "apps/simplyerp/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/simplyerp/tsconfig.app.json"
+      }
+    },
+    "admin": {
+      "type": "application",
+      "root": "apps/admin",
+      "entryFile": "main",
+      "sourceRoot": "apps/admin/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/admin/tsconfig.app.json"
+      }
+    }
   }
 }
