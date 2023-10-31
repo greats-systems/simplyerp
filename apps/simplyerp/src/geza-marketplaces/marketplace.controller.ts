@@ -27,6 +27,6 @@ import GezaMarketplceService from './geza-marketplaces.service';
     }
     @Post('search-for-stylists')
     async searchForOfferItems(@Body() search: string) {
-      return this.marketplceService.searchBeautyServiceProviders(search);
+      // return this.marketplceService.searchBeautyServiceProviders(search);
     }
   }
