@@ -4,7 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import {  ConnectedUser, Subscription, User } from './entities/user.entity';
 import { AuthModule } from '../common/auth.module';
 import { UsersController } from './users.controller';
-import Message, { OTP } from './entities/message.entity';
+import  { OTP } from './entities/message.entity';
 import OfferItemsSearchService from '../search/search.service';
 import { SearchModule } from '../search/search.module';
 import LocalFilesService from '../files/localFiles.service';
@@ -35,7 +35,6 @@ import { SalesOrdersService } from '../sales-orders/sales-orders.service';
       User,
       Order,
       OrderLine,
-      Message,
       OTP,
       LocalFile,
       ConnectedUser,

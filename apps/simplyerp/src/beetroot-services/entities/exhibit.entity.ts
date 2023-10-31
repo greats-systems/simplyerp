@@ -1,7 +1,8 @@
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { User } from "../../users/entities/user.entity";
-import { Question, Questionnaire } from "./questionaire.entity";
+import { Question, Questionnaire, QuestionnaireSection } from "./questionaire.entity";
 import { Editor } from "./beetroot-service.entity";
+import { ApiProperty } from '@nestjs/swagger';
 
 @Entity()
 export class Exhibit {
@@ -21,6 +22,8 @@ export class Exhibit {
     editor: Editor
     @ManyToOne(() => Questionnaire, (questionnaire: Questionnaire) => questionnaire.exhibits)
     questionnaire: Questionnaire;
+    @OneToMany(() => QuestionnaireSection, (questionnaireSections) => questionnaireSections.exhibits)
+    questionnaireSections: QuestionnaireSection[];
     @OneToMany(() => Question, (question) => question.exhibits)
     questions: Question[];
 }
@@ -57,3 +60,40 @@ export class Dialogue {
 
 
 
+@Entity()
+export class QuestionAnswer {
+    @PrimaryGeneratedColumn('uuid')
+    id: string;
+    @CreateDateColumn()
+    createdDate: Date;
+    @UpdateDateColumn()
+    updatedDate: Date;
+    @DeleteDateColumn()
+    deletedDate: Date;
+    @ManyToOne(() => User)
+    @JoinColumn()
+    questionner: User
+    @Column({ nullable: true })
+    question: string;
+    @OneToMany(() => Responses, (response) => response.question)
+    responses: Responses[];
+}
+
+@Entity()
+export class Responses {
+    @PrimaryGeneratedColumn('uuid')
+    id: string;
+    @CreateDateColumn()
+    createdDate: Date;
+    @UpdateDateColumn()
+    updatedDate: Date;
+    @DeleteDateColumn()
+    deletedDate: Date;
+    @Column({ nullable: true })
+    comment: string;
+    @OneToOne(() => User,{ nullable: true})
+    commenter: User;
+    @ManyToOne(() => QuestionAnswer, (question) => question.responses)
+    @JoinTable()
+    question: QuestionAnswer[];
+}

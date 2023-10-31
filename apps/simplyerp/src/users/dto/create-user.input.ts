@@ -1,47 +1,49 @@
+import { ApiProperty } from "@nestjs/swagger";
 import { Socket } from "socket.io";
 
 export class CreateUserDTO {
+  @ApiProperty({})
   authToken: string
+  @ApiProperty({})
   firstName?: string;
+  @ApiProperty({})
   lastName?: string;
+  @ApiProperty({})
   password?: string;
+  @ApiProperty({})
+  gender?: string;
+  @ApiProperty({})
   phone: string;
+  @ApiProperty({})
+  email: string;
+  @ApiProperty({})
   neighbourhood?: string;
+  @ApiProperty({})
   city: string;
+  @ApiProperty({})
+  country?: string;
+  @ApiProperty({})
   role: string;
+  @ApiProperty({})
   accountType: string;
+  @ApiProperty({})
   specialization: string;
+  @ApiProperty({})
   searchTerm: string;
+  @ApiProperty({})
   tradingAs: string;
+  @ApiProperty({})
   salary: string;
+  @ApiProperty({})
   department: string;
+  @ApiProperty({})
   jobRole: string;
+  @ApiProperty({})
   deploymentStatus: string;
+  @ApiProperty({})
   streetAddress: string;
 }                  
 
-export class chatDTO {
-  clientAuth: string;
-  content: string;
-  senderID: string;
-  recieverID: string;
-  senderPhone: string;
-  recieverPhone: string;
-  status: string;
-}
-
-export class MessageDTO {
-  socketID: string;
-  clientAuth: string;
-  textContent: string;
-  mediaContent: any;
-  senderID: string;
-  recieverID: string;
-  senderPhone: string;
-  recieverPhone: string;
-  status: string;
-  time: any;
-}
 
 export class SocketPayloadDTO {
   clientAuth: string;

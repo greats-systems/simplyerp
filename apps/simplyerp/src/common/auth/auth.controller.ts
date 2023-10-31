@@ -12,6 +12,7 @@ import { AuthService } from './auth.service';
 import { UsersService } from '../../users/users.service';
 import { CreateUserDTO } from '../../users/dto/create-user.input';
 import { LoginUserDTO, VerifyOTPDTO } from '../../users/dto/login-user.input';
+import { ApiBody, ApiResponse } from '@nestjs/swagger';
 
 @Controller('authentication')
 export class AuthController {
@@ -21,6 +22,12 @@ export class AuthController {
   ) {}
 
   @Post('signup')
+  @ApiResponse({ status: 201, description: 'The record has been successfully created.'})
+  @ApiResponse({ status: 403, description: 'Forbidden.'})
+  @ApiBody({
+     type: CreateUserDTO,
+     description: 'Json structure for user object',
+  })
   enrollUser(@Body() createUserDTO: CreateUserDTO) {
     return this.usersService.onHandleSignUp(createUserDTO);
   }
@@ -41,10 +48,12 @@ export class AuthController {
     return response;
   }
 
-  @Post('getUserByToken')
-  getUserByToken(@Body() access_token) {
-    return this.usersService.decodeUserToken(access_token.access_token);
+  @Post('get-user')
+  getUserByToken(@Body() serviceToken) {
+    console.log('get-user', serviceToken)
+    return this.usersService.decodeUserToken(serviceToken);
   }
+
   @Post('onVerifyOTP')
   onVerifyOTP(@Body() verifyOTPDTO: VerifyOTPDTO) {
     return this.authService.onVerifyOTP(verifyOTPDTO);

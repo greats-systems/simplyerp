@@ -6,22 +6,29 @@ import {
   ExhibitImage,
   Question,
   Questionnaire,
+  QuestionnaireSection,
 } from './entities/questionaire.entity';
 import {
   ExhibitQuestionairedto,
+  ExhibitSectionDto,
   QuestionDto,
+  QuestionnaireSectionDto,
   Questionnairedto,
 } from './dto/exhibitQuestion.dto';
 import { UsersService } from '../users/users.service';
 import { ExhibitService } from './exhibit-service';
 import { Exhibit } from './entities/exhibit.entity';
 import SearchService from '../search/search.service';
+import { User } from '../users/entities/user.entity';
+import { SalesOrdersService } from '../sales-orders/sales-orders.service';
 
 @Injectable()
 export class QuestionService {
   constructor(
     @InjectRepository(Questionnaire)
     private readonly questionnaireRepository: Repository<Questionnaire>,
+    @InjectRepository(QuestionnaireSection)
+    private readonly questionnaireSectionRepository: Repository<QuestionnaireSection>,
     @InjectRepository(Exhibit)
     private readonly exhibitRepository: Repository<Exhibit>,
     @InjectRepository(Question)
@@ -29,13 +36,17 @@ export class QuestionService {
     @InjectRepository(ExhibitImage)
     private readonly exhibitImageRepository: Repository<ExhibitImage>,
     private usersService: UsersService,
+    private salesOrdersService: SalesOrdersService,
     private searchService: SearchService,
   ) {}
+
+  async getEntreprenuers(): Promise<User[]> {
+    return this.usersService.getAllClients();
+  }
 
   async findAll(): Promise<Question[]> {
     return this.questionRepository.find({ relations: ['questionnaires'] });
   }
-
   async findOne(id: string): Promise<Question> {
     return this.questionRepository.findOne({
       where: { id: id },
@@ -43,28 +54,82 @@ export class QuestionService {
     });
   }
 
-  async create(createQuestionDto: Questionnairedto): Promise<Questionnaire> {
+  async createQuestionnaire(
+    createQuestionDto: Questionnairedto,
+  ): Promise<Questionnaire> {
     const { ...questionData } = createQuestionDto;
     console.log('@questionData', questionData);
-
-    let qsnaires = [];
-    let qsns = [];
     const qsnaire = new Questionnaire();
     qsnaire.title = questionData.title;
     qsnaire.category = questionData.category;
     qsnaire.searchTerms = questionData.searchTerms;
     const newQnaire = await this.questionnaireRepository.save(qsnaire);
-    qsnaires.push(newQnaire);
-    console.log('newQnaire', newQnaire);
+    return newQnaire;
+  }
+  async createQuestionnaireSection(
+    questionnaireSectionDto: QuestionnaireSectionDto,
+  ): Promise<QuestionnaireSection> {
+    console.log(
+      '@create Questionnaire Section Data',
+      questionnaireSectionDto.questionnaireID,
+    );
+    const getQuestionnaire = await this.findOneQuestionnaire(
+      questionnaireSectionDto.questionnaireID,
+    );
+    const qsnaire = new QuestionnaireSection();
+    qsnaire.questionnaireID = getQuestionnaire.id;
+    qsnaire.title = questionnaireSectionDto.title;
+    qsnaire.questionnaires = [getQuestionnaire];
+    const newQnaireSection =
+      await this.questionnaireSectionRepository.save(qsnaire);
+    return newQnaireSection;
+  }
+
+  async getNextQuestionnaireSection(id: string, userID: string) {
+    const checkIfUserPaidExhibitFee =
+      await this.salesOrdersService.checkIfUserPaidExhibitFee(userID);
+      console.log('checkIfUserPaidExhibitFee', checkIfUserPaidExhibitFee)
+    if (checkIfUserPaidExhibitFee) {
+      // Execute the query and return the results
+      const section = await this.NextQuestionnaireSection(id);
+      console.log('@section', section);
+      return section;
+    }else{
+       return null
+    }
+  }
+  async saveQuestionnaireSectionQuestions(
+    createQuestionDto: Questionnairedto,
+  ): Promise<QuestionnaireSection> {
+    const { ...questionData } = createQuestionDto;
+    console.log('@questionData', questionData);
+    let qsns = [];
+    let questionnaireSection: QuestionnaireSection;
+    if (createQuestionDto.questionnaireSectionID) {
+      questionnaireSection = await this.questionnaireSectionRepository.findOne({
+        where: { id: createQuestionDto.questionnaireSectionID },
+      });
+    } else {
+      const questionnaireSectionDto = {
+        questionnaireID: createQuestionDto.questionnaireID,
+        title: createQuestionDto.title,
+      };
+      questionnaireSection = await this.createQuestionnaireSection(
+        questionnaireSectionDto,
+      );
+    }
+
+    console.log('questionnaireSection', questionnaireSection);
     if (questionData.questions.length > 0) {
       await Promise.all(
-        questionData.questions.map(async (q: string) => {
-          if (q !== '') {
+        questionData.questions.map(async (q: any) => {
+          console.log('saveQuestionnaireSectionQuestions q: Question', q);
+          if (q.question !== '') {
             const question = new Question();
-            question.question = q;
+            question.question = q.question;
             question.category = questionData.category;
             question.searchTerms = questionData.searchTerms;
-            question.questionnaires = qsnaires;
+            question.questionnaireSections = [questionnaireSection];
             const qsn = await this.questionRepository.save(question);
             console.log('qsn', qsn);
             qsns.push(qsn);
@@ -72,36 +137,91 @@ export class QuestionService {
         }),
       );
     }
-    newQnaire.questions = qsns;
-    await this.questionnaireRepository.save(newQnaire);
-    const updateQnaire = await this.questionnaireRepository.findOne({
-      where: { id: newQnaire.id },
-      relations: { questions: true },
-    });
-    console.log('updateQnaire', updateQnaire);
-    return updateQnaire;
+    questionnaireSection.questions = qsns;
+    await this.questionnaireSectionRepository.save(questionnaireSection);
+    const updatedQuestionnaireSection = await this.findOneQuestionnaireSection(
+      questionnaireSection.id,
+    );
+    console.log('updateQuestionnaireSection', updatedQuestionnaireSection);
+    return updatedQuestionnaireSection;
   }
+
   async createExhibit(
     authToken: string,
-    questionnaire: Questionnaire,
-    files: any,
+    questionnaireID: string,
   ): Promise<any> {
-    const { ...questionData } = questionnaire;
-    console.log('@questionData', questionData);
+    console.log('@questionData', questionnaireID);
 
-    let qsns = [];
+    const questionnaire = await this.findOneQuestionnaire(questionnaireID);
 
     const client = await this.usersService.decodeUserToken(authToken);
     const exhibitInstance = new Exhibit();
     exhibitInstance.client = client;
-    exhibitInstance.editor = questionData.editor;
-    exhibitInstance.questionnaire = questionData;
-    // exhibitInstance.questions = questionData.questions;
-    // const newExhibit = await this.exhibitRepository.save(exhibitInstance);
-    // console.log('newExhibit', newExhibit);
-    if (questionData.questions.length > 0) {
+    exhibitInstance.questionnaire = questionnaire;
+    const newEx = await this.exhibitRepository.save(exhibitInstance);
+    const updateExhibit = await this.findOneExhibit(newEx.id);
+    console.log('updateExhibit', updateExhibit);
+    return {
+      status: 200,
+      data: JSON.stringify(updateExhibit),
+      error: null,
+      errorMessage: null,
+      successMessage: 'success',
+    };
+  }
+  async saveEditorExhibitResponses(
+    authToken: string,
+    questionnaireID: string,
+    intervieweeID: string,
+    questions: any,
+  ): Promise<any> {
+    console.log('@exhibitSection', questionnaireID);
+    let qsns = [];
+    const questionnaireInstance =
+      await this.findOneQuestionnaire(questionnaireID);
+    const intervieweeInstance =
+      await this.usersService.findOneByUserID(intervieweeID);
+    const exhibitInstance = await this.createExhibit(
+      authToken,
+      questionnaireID,
+    );
+    if (questions.length > 0) {
       await Promise.all(
-        questionData.questions.map(async (q: Question) => {
+        questions.map(async (q: Question) => {
+          console.log('q: Question', q);
+          if (q && q.question != '' && q.answer != '') {
+            const question = new Question();
+            question.question = q.question;
+            question.category = questionnaireInstance.category;
+            question.searchTerms = questionnaireInstance.searchTerms;
+            question.responder = intervieweeInstance;
+            question.answer = q.answer;
+            const qsn = await this.questionRepository.save(question);
+            console.log('qsn', qsn);
+            qsns.push(qsn);
+          }
+        }),
+      );
+    }
+    exhibitInstance.questions = qsns;
+    const newEx = await this.exhibitRepository.save(exhibitInstance);
+    const updateExhibit = await this.findOneExhibit(newEx.id);
+    console.log('updateExhibit', updateExhibit);
+    return updateExhibit;
+  }
+
+  async saveExhibitSectionResponses(
+    authToken: string,
+    exhibitSection: ExhibitSectionDto,
+    files: any,
+  ): Promise<any> {
+    console.log('@exhibitSection', exhibitSection);
+    let qsns = [];
+    const exhibitInstance = await this.findOneExhibit(exhibitSection.exhibitID);
+
+    if (exhibitSection.questions.length > 0) {
+      await Promise.all(
+        exhibitSection.questions.map(async (q: Question) => {
           if (q) {
             const question = new Question();
             question.question = q.question;
@@ -128,8 +248,6 @@ export class QuestionService {
       successMessage: 'success',
     };
   }
-
-
   async submitExhibitForReview(
     authToken: string,
     questionnaire: Questionnaire,
@@ -190,13 +308,12 @@ export class QuestionService {
     };
   }
   async findAllQuestions(): Promise<Question[]> {
-    const queryBuilder =
-      this.questionRepository.createQueryBuilder('question');
+    const queryBuilder = this.questionRepository.createQueryBuilder('question');
 
     // Join with the Customer and Vendor relations
     queryBuilder
       .leftJoinAndSelect('question.editor', 'editor')
-      .leftJoinAndSelect('question.questions', 'questions')
+      .leftJoinAndSelect('question.questions', 'questions');
 
     // Use OR to match either customer or provider userID
     // queryBuilder.where('question.searchTerms = :searchTerms', {
@@ -210,13 +327,12 @@ export class QuestionService {
     return question;
   }
   async findOneQuestion(id: string): Promise<Question[]> {
-    const queryBuilder =
-      this.questionRepository.createQueryBuilder('question');
+    const queryBuilder = this.questionRepository.createQueryBuilder('question');
 
     // Join with the Customer and Vendor relations
     queryBuilder
       .leftJoinAndSelect('question.editor', 'editor')
-      .leftJoinAndSelect('question.question', 'question')
+      .leftJoinAndSelect('question.question', 'question');
 
     // Use OR to match either customer or provider userID
     queryBuilder.where('question.id = :id', {
@@ -236,7 +352,11 @@ export class QuestionService {
     // Join with the Customer and Vendor relations
     queryBuilder
       .leftJoinAndSelect('questionnaire.editor', 'editor')
-      .leftJoinAndSelect('questionnaire.questions', 'questions')
+      .leftJoinAndSelect(
+        'questionnaire.questionnaireSections',
+        'questionnaireSections',
+      )
+      .leftJoinAndSelect('questionnaireSections.questions', 'questions');
 
     // Use OR to match either customer or provider userID
     // queryBuilder.where('questionnaire.searchTerms = :searchTerms', {
@@ -249,7 +369,27 @@ export class QuestionService {
     console.log('@exhibit', exhibit);
     return exhibit;
   }
+  async findOneQuestionnaireByID(id:string): Promise<Questionnaire> {
+    const queryBuilder =
+      this.questionnaireRepository.createQueryBuilder('questionnaire');
+    // Join with the Customer and Vendor relations
+    queryBuilder
+      .leftJoinAndSelect('questionnaire.editor', 'editor')
+      .leftJoinAndSelect(
+        'questionnaire.questionnaireSections',
+        'questionnaireSections',
+      )
+      .leftJoinAndSelect('questionnaireSections.questions', 'questions');
 
+    // Use OR to match either customer or provider userID
+    queryBuilder.where('questionnaire.id = :id', {
+      id,
+    });
+    // Execute the query and return the results
+    const questionnaire = await queryBuilder.getOne();
+    console.log('@questionnaire', questionnaire);
+    return questionnaire;
+  }
   async findOneQuestionnaire(id: string): Promise<Questionnaire> {
     const queryBuilder =
       this.questionnaireRepository.createQueryBuilder('questionnaire');
@@ -257,7 +397,10 @@ export class QuestionService {
     // Join with the Customer and Vendor relations
     queryBuilder
       .leftJoinAndSelect('questionnaire.editor', 'editor')
-      .leftJoinAndSelect('questionnaire.questions', 'questions')
+      .leftJoinAndSelect(
+        'questionnaire.questionnaireSections',
+        'questionnaireSections',
+      );
 
     // Use OR to match either customer or provider userID
     queryBuilder.where('questionnaire.id = :id', {
@@ -270,10 +413,64 @@ export class QuestionService {
     console.log('@questionnaire', questionnaire);
     return questionnaire;
   }
-
-  async findAccountExhibits(userID: string): Promise<Exhibit[]> {
+  async getAllQuestionnaireSections(): Promise<QuestionnaireSection[]> {
     const queryBuilder =
-      this.exhibitRepository.createQueryBuilder('exhibit');
+      this.questionnaireSectionRepository.createQueryBuilder('section');
+
+    // Join with the Customer and Vendor relations
+    queryBuilder
+      .leftJoinAndSelect('section.exhibits', 'exhibits')
+      .leftJoinAndSelect('section.questions', 'questions')
+      .leftJoinAndSelect('section.questionnaires', 'questionnaires');
+
+    // Execute the query and return the results
+    const questionnaire = await queryBuilder.getMany();
+
+    console.log('@questionnaire', questionnaire);
+    return questionnaire;
+  }
+  async findOneQuestionnaireSection(id: string): Promise<QuestionnaireSection> {
+    const queryBuilder =
+      this.questionnaireSectionRepository.createQueryBuilder('section');
+
+    // Join with the Customer and Vendor relations
+    queryBuilder
+      .leftJoinAndSelect('section.exhibits', 'exhibits')
+      .leftJoinAndSelect('section.questions', 'questions')
+      .leftJoinAndSelect('section.questionnaires', 'questionnaires');
+
+    // Use OR to match either customer or provider userID
+    queryBuilder.where('section.id = :id', {
+      id,
+    });
+
+    // Execute the query and return the results
+    const questionnaire = await queryBuilder.getOne();
+
+    console.log('@questionnaire', questionnaire);
+    return questionnaire;
+  }
+  async NextQuestionnaireSection(id: string): Promise<QuestionnaireSection> {
+    const queryBuilder =
+      this.questionnaireSectionRepository.createQueryBuilder('section');
+
+    // Join with the Customer and Vendor relations
+    queryBuilder
+      .leftJoinAndSelect('section.questions', 'questions');
+
+    // Use OR to match either customer or provider userID
+    queryBuilder.where('section.id = :id', {
+      id,
+    });
+
+    // Execute the query and return the results
+    const questionnaire = await queryBuilder.getOne();
+
+    console.log('@questionnaire', questionnaire);
+    return questionnaire;
+  }
+  async findAccountExhibits(userID: string): Promise<Exhibit[]> {
+    const queryBuilder = this.exhibitRepository.createQueryBuilder('exhibit');
 
     // Join with the Customer and Vendor relations
     queryBuilder
@@ -281,7 +478,10 @@ export class QuestionService {
       .leftJoinAndSelect('exhibit.client', 'client')
       .leftJoinAndSelect('exhibit.questions', 'questions')
       .leftJoinAndSelect('exhibit.questionnaire', 'questionnaire')
-      .leftJoinAndSelect('questionnaire.questions', 'questionnaire_questions');
+      .leftJoinAndSelect(
+        'questionnaire.questionnaireSections',
+        'questionnaireSections',
+      );
 
     // Use OR to match either customer or provider userID
     queryBuilder.where('client.userID = :userID', {
@@ -294,10 +494,8 @@ export class QuestionService {
     console.log('@exhibit', exhibit);
     return exhibit;
   }
-
-  async findOneExhibit(id: string): Promise<Exhibit> {
-    const queryBuilder =
-      this.exhibitRepository.createQueryBuilder('exhibit');
+  async findAllExhibits(): Promise<Exhibit[]> {
+    const queryBuilder = this.exhibitRepository.createQueryBuilder('exhibit');
 
     // Join with the Customer and Vendor relations
     queryBuilder
@@ -305,7 +503,28 @@ export class QuestionService {
       .leftJoinAndSelect('exhibit.client', 'client')
       .leftJoinAndSelect('exhibit.questions', 'questions')
       .leftJoinAndSelect('exhibit.questionnaire', 'questionnaire')
-      .leftJoinAndSelect('questionnaire.questions', 'questionnaire_questions');
+      .leftJoinAndSelect(
+        'questionnaire.questionnaireSections',
+        'questionnaireSections',
+      );
+
+    // Use OR to match either customer or provider userID
+
+    // Execute the query and return the results
+    const exhibit = await queryBuilder.getMany();
+
+    console.log('@exhibit', exhibit);
+    return exhibit;
+  }
+  async findOneExhibit(id: string): Promise<Exhibit> {
+    const queryBuilder = this.exhibitRepository.createQueryBuilder('exhibit');
+
+    // Join with the Customer and Vendor relations
+    queryBuilder
+      .leftJoinAndSelect('exhibit.editor', 'editor')
+      .leftJoinAndSelect('exhibit.client', 'client')
+      .leftJoinAndSelect('exhibit.questions', 'questions')
+      .leftJoinAndSelect('exhibit.questionnaire', 'questionnaire');
 
     // Use OR to match either customer or provider userID
     queryBuilder.where('exhibit.id = :id', {

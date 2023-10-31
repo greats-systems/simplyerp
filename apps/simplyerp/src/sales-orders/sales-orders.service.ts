@@ -4,6 +4,7 @@ import { UsersService } from '../users/users.service';
 import { Repository } from 'typeorm';
 import { Order, OrderLine } from './entities/order.entity';
 import { ServiceProvider } from '../service-providers/entities/service-provider.entity';
+import { User } from '../users/entities/user.entity';
 
 @Injectable()
 export class SalesOrdersService {
@@ -112,5 +113,27 @@ export class SalesOrdersService {
   
       console.log('@serviceProvider', serviceProvider);
       return serviceProvider;
+    }
+
+    async checkIfUserPaidExhibitFee(userID: string, ): Promise<Order> {
+
+      const orderStatus = 'paid'
+      const orderType ='exhbitFee'
+      const queryBuilder = this.orderRepository.createQueryBuilder('order');
+  
+      // Join with the Customer and Vendor relations
+      queryBuilder
+        .leftJoinAndSelect('order.customer', 'customer')
+        .leftJoinAndSelect('order.provider', 'provider')
+        .leftJoinAndSelect('provider.user', 'user')
+        .leftJoinAndSelect('order.orderLines', 'orderLines')
+        .leftJoinAndSelect('orderLines.service', 'service')
+  
+      // Use OR to match either customer or provider userID
+      queryBuilder.where('customer.userID = :userID AND order.orderType = :orderType AND order.orderStatus = :orderStatus', { userID, orderType,  orderStatus });
+  
+      // Execute the query and return the results
+      const order = await queryBuilder.getOne();
+      return order;
     }
 }

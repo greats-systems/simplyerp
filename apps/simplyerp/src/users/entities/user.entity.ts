@@ -3,7 +3,14 @@ import LocalFile from '../../files/localFile.entity';
 import { Wallet } from './wallet.entity';
 import { Order } from '../../sales-orders/entities/order.entity';
 import { Exclude } from 'class-transformer';
-import { Exhibit } from '../../beetroot-services/entities/exhibit.entity';
+import { Chat } from '../../messaging/entities/messaging.entity';
+import { ApiProperty } from '@nestjs/swagger';
+
+export enum UserRole {
+  Admin = 'Admin',
+  Moderator = 'Moderator',
+  User = 'User'
+}
 
 
 
@@ -111,6 +118,9 @@ export class User {
   public avatarId?: string;
   @OneToMany(() => Order, (order: Order) => order.customer)
   orders: Order[];
+
+  @OneToMany(() => Chat, (chat: Chat) => chat.sender)
+  chats: Chat[];
 
   @OneToMany(() => Subscription, (subscription: Subscription) => subscription.profile)
   subscriptions: Subscription[];

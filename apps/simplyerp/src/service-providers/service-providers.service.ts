@@ -536,7 +536,6 @@ export class ServiceProvidersService {
   }
 
   async getCatelogsByAccountID(accountID: string): Promise<Catalog[]> {
-    console.log('getCatelogsByAccountID acc id', accountID);
     if (accountID) {
      
       const queryBuilder = this.catalogRepository.createQueryBuilder('catalog');

@@ -247,7 +247,6 @@ export class BeautyServiceService {
   }
 
   async getCatelogsByAccountID(accountID: string): Promise<Catalog[]> {
-    console.log('getCatelogsByAccountID acc id', accountID);
     if (accountID) {
      
       const queryBuilder = this.catalogRepository.createQueryBuilder('catalog');
@@ -264,7 +263,6 @@ export class BeautyServiceService {
         return null;
         // throw new NotFoundException(`User with ${email} not found`);
       }
-      console.log('catalogs', catalogs);
       return catalogs;
     }
   }
@@ -369,7 +367,6 @@ export class BeautyServiceService {
     let orderRequestClientID = orderRequest['clientID']
     let orderRequestProviderID = orderRequest['providerID']
     let orderRequestCommodity = orderRequest['commodity']
-    console.log('requestBookingOrder data', orderRequestCommodity['id'])
     let requestOrder: PlaceOrderSocketDTO = {
       orderID: '',
       commodityID: orderRequestCommodity['id'],

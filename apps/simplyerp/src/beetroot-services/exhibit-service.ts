@@ -3,7 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Question, Questionnaire } from './entities/questionaire.entity';
 import { QuestionDto, Questionnairedto } from './dto/exhibitQuestion.dto';
-
+var WPAPI = require( 'wpapi/superagent' );
+var wp = new WPAPI({ endpoint: 'http://beetroot.today/wp-json' });
 
 @Injectable()
 export class ExhibitService {
@@ -36,7 +37,6 @@ export class ExhibitService {
           questions.push(newQuestion);
         }),
       );
-      exhibitQuestionaire.questions = questions;
 
     }
     const updatedQuestionnaire = await this.exhibitQuestionaireRepository.save(exhibitQuestionaire);
@@ -44,9 +44,14 @@ export class ExhibitService {
     return updatedQuestionnaire;
 
   }
-  async getQuestionnaireById(id: string): Promise<Questionnaire | null> {
-    const exhibitQuestionaire = await this.exhibitQuestionaireRepository.findOne({where:{id: id}});
-    return exhibitQuestionaire || null;
+  async getPosts(): Promise<any> {
+    try {
+      const posts = await wp.posts().get();
+      console.log('recived posts', posts)
+      return posts 
+    } catch (error) {
+      return;
+    }    
   }
 
   async updateQuestionnaire(id: string, exhibitQuestionaireData: Questionnairedto): Promise<Questionnaire | null> {

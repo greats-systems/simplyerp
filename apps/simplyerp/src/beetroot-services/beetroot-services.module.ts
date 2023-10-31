@@ -17,10 +17,10 @@ import { UsersModule } from '../users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { ExhibitService } from './exhibit-service';
-import { ExhibitImage, Question, Questionnaire } from './entities/questionaire.entity';
+import { ExhibitImage, Question, Questionnaire, QuestionnaireSection } from './entities/questionaire.entity';
 import { QuestionService } from './question-service';
 import { Editor } from './entities/beetroot-service.entity';
-import { Exhibit, Dialogue } from './entities/exhibit.entity';
+import { Exhibit, Dialogue, QuestionAnswer, Responses } from './entities/exhibit.entity';
 import { BeetrootServicesController } from './beetroot-services.controller';
 
 @Module({
@@ -32,11 +32,14 @@ import { BeetrootServicesController } from './beetroot-services.controller';
     forwardRef(() => ServiceProvidersModule),
     TypeOrmModule.forFeature([
       Questionnaire,
+      QuestionnaireSection,
       Question,
       Exhibit,
       Dialogue,
       Editor,
-      ExhibitImage
+      ExhibitImage,
+      QuestionAnswer, 
+      Responses
     ]),
   ],
   controllers: [

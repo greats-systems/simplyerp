@@ -202,8 +202,6 @@ export class ServiceProvidersController {
         errorMessage: null,
         successMessage: 'success',
       };
-      console.log('getAccountCatelog successData', successData);
-
       return successData;
     }
     return null;

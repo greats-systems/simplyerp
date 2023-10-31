@@ -100,7 +100,7 @@ export class AuthService {
 
       response = {
         status: 200,
-        data: JSON.stringify({ ...user, token: loggedUser.access_token },
+        data: JSON.stringify({ user, serviceToken: loggedUser.access_token },
         ),
         err: null,
         errorMessage: null,

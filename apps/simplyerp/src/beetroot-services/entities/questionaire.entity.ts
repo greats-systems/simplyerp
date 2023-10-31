@@ -31,9 +31,9 @@ export class Questionnaire {
     @OneToMany(() => Exhibit, (exhibit) => exhibit.questionnaire)
     @JoinTable()
     exhibits: Exhibit[];
-    @ManyToMany(() => Question, (question) => question.questionnaires)
+    @ManyToMany(() => QuestionnaireSection, (questionnaireSection) => questionnaireSection.questionnaires)
     @JoinTable()
-    questions: Question[];
+    questionnaireSections: QuestionnaireSection[];
     @OneToMany(() => ExhibitImage, (images: ExhibitImage) => images.questionnaire)
     images: ExhibitImage[];
 }
@@ -50,6 +50,35 @@ export class ExhibitImage {
   @ManyToOne(() => Questionnaire, (service: Questionnaire) => service.images)
   public questionnaire: Questionnaire;
 }
+
+@Entity()
+export class QuestionnaireSection {
+    @PrimaryGeneratedColumn('uuid')
+    id: string;
+    @CreateDateColumn()
+    createdDate: Date;
+    @UpdateDateColumn()
+    updatedDate: Date;
+    @DeleteDateColumn()
+    deletedDate: Date;
+    @Column({ nullable: true })
+    questionnaireID: string
+    @Column({ nullable: true })
+    title: string;
+    @ManyToMany(() => Questionnaire, (questionnaire) => questionnaire.questionnaireSections)
+    @JoinTable()
+    questionnaires: Questionnaire[];
+    @ManyToOne(() => Exhibit, (exhibit) => exhibit.questions)
+    @JoinTable()
+    exhibits: Exhibit[];
+    @Column({ nullable: true })
+    meta: string;
+    @ManyToMany(() => Question, (question) => question.questionnaireSections)
+    @JoinTable()
+    questions: Question[];
+
+}
+
 @Entity()
 export class Question {
     @PrimaryGeneratedColumn('uuid')
@@ -72,9 +101,9 @@ export class Question {
     responder: User;
     @ManyToOne(() => ServiceProvider, (provider: ServiceProvider) => provider.orders)
     publisher: User;
-    @ManyToMany(() => Questionnaire, (questionnaire) => questionnaire.questions)
+    @ManyToMany(() => QuestionnaireSection, (questionnairesection) => questionnairesection.questions)
     @JoinTable()
-    questionnaires: Questionnaire[];
+    questionnaireSections: QuestionnaireSection[];
     @ManyToOne(() => Exhibit, (exhibit) => exhibit.questions)
     @JoinTable()
     exhibits: Exhibit[];

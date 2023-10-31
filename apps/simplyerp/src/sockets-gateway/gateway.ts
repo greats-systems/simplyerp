@@ -6,7 +6,7 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-import { MessageDTO, SocketAuthDTO } from '../users/dto/create-user.input';
+import { SocketAuthDTO } from '../users/dto/create-user.input';
 
 import { SocketService } from './service';
 import { Server, Socket } from 'socket.io';
@@ -58,46 +58,5 @@ export class SocketsGateway implements OnGatewayConnection {
     return;
   }
 
-  @SubscribeMessage('new-message')
-  async newMessage(
-    @MessageBody() socketAuthDTO: MessageDTO,
-    @ConnectedSocket() socket: Socket,
-  ) {
-    console.log('socketAuthDTO', socketAuthDTO)
-    let sender: any;
-    const authenticatedClient = await this.socketService.getUserFromAuthToken(
-      socketAuthDTO.clientAuth,
-    );
-    if (authenticatedClient) {
-      const authenticatedReciever = await this.socketService.getUserByID(
-        socketAuthDTO.recieverID,
-      );
-      console.log('authenticatedReciever', authenticatedReciever)
-      let receiver = await this.socketService.findConnectedUser(socketAuthDTO.recieverID)
-      console.log('recieve-receiver', receiver)
-      const receiverData = {
-        socketID: receiver.socketID,
-        receiver: receiver,
-        textContent: socketAuthDTO.textContent,
-        mediaContent: socketAuthDTO.mediaContent,
-        status: socketAuthDTO.status,
-        time: socketAuthDTO.time
 
-      };
-      console.log('receiver.socketID', receiver.socketID)
-
-      this.server.sockets
-        .to(receiver.socketID)
-        .emit('recieve-message', JSON.stringify(receiverData));
-
-      sender = await this.socketService.socketRegisterUser(authenticatedClient, socket, socketAuthDTO.status);
-      const senderData = {
-        socketID: sender.socketID,
-        data: sender,
-      };
-      this.server.sockets
-        .to(sender.socketID)
-        .emit('update-message-status', JSON.stringify(senderData));
-    }
-  }
 }

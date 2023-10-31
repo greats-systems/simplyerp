@@ -11,6 +11,7 @@ import { BeetrootServicesModule } from './beetroot-services/beetroot-services.mo
 import { MarketplacesModule } from './marketplaces/marketplaces.module';
 import { GezaMarketplacesModule } from './geza-marketplaces/geza-marketplaces.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { MessagingModule } from './messaging/messaging.module';
 
 @Module({
   
@@ -31,7 +32,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
       // disable throwing uncaughtException if an error event is emitted and it has no listeners
       ignoreErrors: false,
     }),
-    CommonModule, UsersModule, ServiceProvidersModule, UserWalletsModule, SalesOrdersModule, AdminModule, BeetrootServicesModule, MarketplacesModule, GezaMarketplacesModule,
+    CommonModule, UsersModule, ServiceProvidersModule, UserWalletsModule, SalesOrdersModule, AdminModule, BeetrootServicesModule, MarketplacesModule, GezaMarketplacesModule, MessagingModule,
   ],
   controllers: [AppController],
   providers: [AppService],

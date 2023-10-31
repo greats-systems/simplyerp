@@ -3,8 +3,6 @@ import { Socket } from 'socket.io';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ConnectedUser, User } from '../users/entities/user.entity';
-import Message from '../users/entities/message.entity';
-import { MessageDTO } from '../users/dto/create-user.input';
 import { UsersService } from '../users/users.service';
 
 @Injectable()
@@ -13,9 +11,6 @@ export class SocketService {
     @InjectRepository(ConnectedUser)
     private readonly connectedUserRepository: Repository<ConnectedUser>,
     private readonly usersService: UsersService,
-
-    @InjectRepository(Message)
-    private messagesRepository: Repository<Message>,
   ) {
   }
   async socketRegisterUser(user, socket: Socket, status: string) {
@@ -129,23 +124,5 @@ export class SocketService {
       newUser = await this.usersService.getUserByID(recieverID)
       return newUser;
      }else{return}
-  }
-
-
-
-  
-
-  async saveMessage(messageDTO: MessageDTO) {
-    const newMessage = await this.messagesRepository.create(messageDTO);
-    await this.messagesRepository.save(newMessage);
-    return newMessage;
-  }
-
-  
-
-  async getAllMessages() {
-    return this.messagesRepository.find({
-      relations: ['author']
-    });
   }
 }
