@@ -32,7 +32,9 @@ import { MessagingModule } from './messaging/messaging.module';
       // disable throwing uncaughtException if an error event is emitted and it has no listeners
       ignoreErrors: false,
     }),
-    CommonModule, UsersModule, ServiceProvidersModule, UserWalletsModule, SalesOrdersModule, AdminModule, BeetrootServicesModule, MarketplacesModule, GezaMarketplacesModule, MessagingModule,
+    CommonModule, UsersModule, ServiceProvidersModule, UserWalletsModule, SalesOrdersModule, AdminModule, BeetrootServicesModule, MarketplacesModule, 
+    // GezaMarketplacesModule,
+     MessagingModule,
   ],
   controllers: [AppController],
   providers: [AppService],

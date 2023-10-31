@@ -3,7 +3,7 @@ import { BeetrootServicesService } from './beetroot-services.service';
 import { BeetrootServicesGateway } from './beetroot-services.gateway';
 import { JwtService } from '@nestjs/jwt';
 import { SalesOrdersService } from '../sales-orders/sales-orders.service';
-import SearchService from '../search/search.service';
+// import SearchService from '../search/search.service';
 import { ServiceProvidersGateway } from '../service-providers/service-providers.gateway';
 import { ServiceProvidersService } from '../service-providers/service-providers.service';
 import { SocketService } from '../sockets-gateway/service';
@@ -11,7 +11,7 @@ import { UserWalletsService } from '../user-wallets/user-wallets.service';
 import { UsersService } from '../users/users.service';
 import { HttpModule } from '@nestjs/axios';
 import { AuthModule } from '../common/auth.module';
-import { SearchModule } from '../search/search.module';
+// import { SearchModule } from '../search/search.module';
 import { ServiceProvidersModule } from '../service-providers/service-providers.module';
 import { UsersModule } from '../users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -26,7 +26,7 @@ import { BeetrootServicesController } from './beetroot-services.controller';
 @Module({
   imports: [
     forwardRef(() => AuthModule),
-    forwardRef(() => SearchModule),
+    // forwardRef(() => SearchModule),
     forwardRef(() => HttpModule),
     forwardRef(() => UsersModule),
     forwardRef(() => ServiceProvidersModule),
@@ -55,7 +55,7 @@ import { BeetrootServicesController } from './beetroot-services.controller';
     ServiceProvidersService,
     SocketService,
     UsersService,
-    SearchService,
+    // SearchService,
     JwtService,
     UserWalletsService,
     SalesOrdersService,

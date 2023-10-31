@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule as NestConfigModule } from '@nestjs/config';
-import { ElasticsearchModule } from '@nestjs/elasticsearch/dist/elasticsearch.module';
+// import { ElasticsearchModule } from '@nestjs/elasticsearch/dist/elasticsearch.module';
 import * as Joi from '@hapi/joi';
 
 @Module({
@@ -13,9 +13,9 @@ import * as Joi from '@hapi/joi';
         // ...
       })
     }),
-    ElasticsearchModule.register({
-      node: 'http://localhost:9200',
-    })
+    // ElasticsearchModule.register({
+    //   node: 'http://localhost:9200',
+    // })
   ],
 })
 export class ConfigModule {}

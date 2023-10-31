@@ -4,7 +4,7 @@ import { MessagingGateway } from './messaging.gateway';
 import { HttpModule } from '@nestjs/axios';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from '../common/auth.module';
-import { SearchModule } from '../search/search.module';
+// import { SearchModule } from '../search/search.module';
 import { ServiceProvidersModule } from '../service-providers/service-providers.module';
 import { UsersModule } from '../users/users.module';
 import { JwtService } from '@nestjs/jwt';
@@ -12,7 +12,7 @@ import { BeetrootServicesService } from '../beetroot-services/beetroot-services.
 import { ExhibitService } from '../beetroot-services/exhibit-service';
 import { QuestionService } from '../beetroot-services/question-service';
 import { SalesOrdersService } from '../sales-orders/sales-orders.service';
-import SearchService from '../search/search.service';
+// import SearchService from '../search/search.service';
 import { ServiceProvidersGateway } from '../service-providers/service-providers.gateway';
 import { ServiceProvidersService } from '../service-providers/service-providers.service';
 import { SocketService } from '../sockets-gateway/service';
@@ -24,7 +24,7 @@ import { Chat, Message } from './entities/messaging.entity';
 @Module({
   imports: [
     forwardRef(() => AuthModule),
-    forwardRef(() => SearchModule),
+    // forwardRef(() => SearchModule),
     forwardRef(() => HttpModule),
     forwardRef(() => UsersModule),
     forwardRef(() => ServiceProvidersModule),
@@ -44,7 +44,7 @@ import { Chat, Message } from './entities/messaging.entity';
     ServiceProvidersService,
     SocketService,
     UsersService,
-    SearchService,
+    // SearchService,
     JwtService,
     UserWalletsService,
     SalesOrdersService,

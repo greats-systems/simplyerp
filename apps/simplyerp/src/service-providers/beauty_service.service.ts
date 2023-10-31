@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import SearchService from '../search/search.service';
+// import SearchService from '../search/search.service';
 import { UsersService } from '../users/users.service';
 import { Repository } from 'typeorm';
 import { Catalog } from './entities/catalog.entity';
@@ -42,7 +42,7 @@ export class BeautyServiceService {
 
 
     private readonly usersService: UsersService,
-    private searchService: SearchService,
+    // private searchService: SearchService,
     private serviceProvidersService: ServiceProvidersService,
   ) {}
   async createNewCatelog(createCatalogDTO: CreateCatalogDTO) {
@@ -161,8 +161,8 @@ export class BeautyServiceService {
     );
     // }
     console.log('BeautyService', service);
-    const indexed = await this.searchService.indexBeautyService(service);
-    console.log('indexed', indexed);
+    // const indexed = await this.searchService.indexBeautyService(service);
+    // console.log('indexed', indexed);
 
     return {
       status: 200,
@@ -213,8 +213,8 @@ export class BeautyServiceService {
     const service = await this.getBeautyServiceByID(oldService.id);
     // }
     console.log('updatedBeautyService', service);
-    const indexed = await this.searchService.indexBeautyService(service);
-    console.log('indexed', indexed);
+    // const indexed = await this.searchService.indexBeautyService(service);
+    // console.log('indexed', indexed);
 
     return {
       status: 200,

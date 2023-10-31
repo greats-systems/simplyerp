@@ -5,8 +5,8 @@ import {  ConnectedUser, Subscription, User } from './entities/user.entity';
 import { AuthModule } from '../common/auth.module';
 import { UsersController } from './users.controller';
 import  { OTP } from './entities/message.entity';
-import OfferItemsSearchService from '../search/search.service';
-import { SearchModule } from '../search/search.module';
+// import OfferItemsSearchService from '../search/search.service';
+// import { SearchModule } from '../search/search.module';
 import LocalFilesService from '../files/localFiles.service';
 import LocalFile from '../files/localFile.entity';
 import { HttpModule } from '@nestjs/axios';
@@ -18,7 +18,6 @@ import { SocketsGateway } from '../sockets-gateway/gateway';
 import { SocketService } from '../sockets-gateway/service';
 import { ServiceProvidersService } from '../service-providers/service-providers.service';
 import { ServiceProvidersModule } from '../service-providers/service-providers.module';
-import { UserWalletsModule } from '../user-wallets/user-wallets.module';
 import { UserWalletsService } from '../user-wallets/user-wallets.service';
 import { Order, OrderLine } from '../sales-orders/entities/order.entity';
 import { SalesOrdersService } from '../sales-orders/sales-orders.service';
@@ -26,7 +25,7 @@ import { SalesOrdersService } from '../sales-orders/sales-orders.service';
 @Module({
   imports: [
     forwardRef(() => AuthModule),
-    forwardRef(() => SearchModule),
+    // forwardRef(() => SearchModule),
     forwardRef(() => HttpModule),    // forwardRef(() => ServiceProvidersModule),
     ServiceProvidersModule,
     
@@ -53,7 +52,7 @@ import { SalesOrdersService } from '../sales-orders/sales-orders.service';
     SocketService,
     SocketsGateway,
     ServiceProvidersService,
-    OfferItemsSearchService,
+    // OfferItemsSearchService,
     LocalFilesService,
     JwtService,
     SalesOrdersService,

@@ -4,7 +4,7 @@ import {
   Vehicle,
   VehicleImage,
 } from '../service-providers/entities/logistics.entity';
-import SearchService from '../search/search.service';
+// import SearchService from '../search/search.service';
 import { UsersService } from '../users/users.service';
 import { Repository } from 'typeorm';
 import { Catalog } from './entities/catalog.entity';
@@ -65,7 +65,7 @@ export class ServiceProvidersService {
     private VehicleImageRepository: Repository<VehicleImage>,
 
     private readonly usersService: UsersService,
-    private searchService: SearchService,
+    // private searchService: SearchService,
     private salesOrdersService: SalesOrdersService,
   ) {}
   
@@ -345,8 +345,8 @@ export class ServiceProvidersService {
     const service = await this.getBeautyServiceByID(oldService.id);
     // }
     console.log('updatedBeautyService', service);
-    const indexed = await this.searchService.indexBeautyService(service);
-    console.log('indexed', indexed);
+    // const indexed = await this.searchService.indexBeautyService(service);
+    // console.log('indexed', indexed);
 
     return {
       status: 200,
@@ -425,8 +425,8 @@ export class ServiceProvidersService {
     );
     // }
     console.log('ProfessionalService', service);
-    const indexed = await this.searchService.indexProfessionalService(service);
-    console.log('indexed', indexed);
+    // const indexed = await this.searchService.indexProfessionalService(service);
+    // console.log('indexed', indexed);
 
     return {
       status: 200,

@@ -18,7 +18,7 @@ import {
 import { UsersService } from '../users/users.service';
 import { ExhibitService } from './exhibit-service';
 import { Exhibit } from './entities/exhibit.entity';
-import SearchService from '../search/search.service';
+// import SearchService from '../search/search.service';
 import { User } from '../users/entities/user.entity';
 import { SalesOrdersService } from '../sales-orders/sales-orders.service';
 
@@ -37,7 +37,7 @@ export class QuestionService {
     private readonly exhibitImageRepository: Repository<ExhibitImage>,
     private usersService: UsersService,
     private salesOrdersService: SalesOrdersService,
-    private searchService: SearchService,
+    // private searchService: SearchService,
   ) {}
 
   async getEntreprenuers(): Promise<User[]> {
@@ -296,8 +296,8 @@ export class QuestionService {
       searchTerms: getExhibit.searchTerms,
       body: questionnaire.body,
     };
-    const indexed = await this.searchService.indexExhibit(indexExhibit);
-    console.log('indexed', indexed);
+    // const indexed = await this.searchService.indexExhibit(indexExhibit);
+    // console.log('indexed', indexed);
 
     return {
       status: 200,
