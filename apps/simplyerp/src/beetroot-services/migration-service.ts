@@ -53,8 +53,12 @@ export class MigrationService {
     const randomIndex = Math.floor(Math.random() * users.length);
     return users[randomIndex];
   }
+  async runMigrations(){
+    await this.populateDatabaseWitQuestionAndAnswers();
+    await this.populateDatabaseWithUserData();
+  }
 
-  async  createQuestionAndAnswers() {
+  async  populateDatabaseWitQuestionAndAnswers() {
     const questionsAndAnswers = [
       {
         question: 'As a startup in South Africa, what are the requirements for applying for a business loan?',
@@ -136,6 +140,12 @@ export class MigrationService {
       // Save the question and associated answers to the database
       return this.questionAnswerRepository.save(questionAnswer);
     }
+  }
+
+  async  populateDatabaseWithUserData() {
+    console.log('....populateDatabaseWithUserData')
+   const usrs =  await this.usersService.populateDatabaseWithUserData();
+   return usrs;
   }
   
 }

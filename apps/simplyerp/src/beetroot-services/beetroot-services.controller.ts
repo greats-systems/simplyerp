@@ -34,11 +34,10 @@ export class BeetrootServicesController {
     private readonly exhibitServiceService: ExhibitService,
     private readonly migrationService: MigrationService,
     ) {}
-
-    @Get('run-migrations')
-    async runMigrations() {
-      console.log('getPosts');
-      const posts = await this.migrationService.createQuestionAndAnswers();
+    @Get('run-users-migrations')
+    async populateDatabaseWithUserData() {
+      console.log('populateDatabaseWithUserData');
+      const posts = await this.migrationService.populateDatabaseWithUserData();
       if (posts) {
         const successData = {
           status: 200,
@@ -47,12 +46,31 @@ export class BeetrootServicesController {
           errorMessage: null,
           successMessage: 'success',
         };
-        console.log('getQuestionnaires successData', successData);
+        console.log('runMigrations successData', successData);
   
         return successData;
       }
       return null;
     }
+    @Get('run-qna-migrations')
+    async populateDatabaseWitQuestionAndAnswers() {
+      console.log('populateDatabaseWitQuestionAndAnswers');
+      const posts = await this.migrationService.populateDatabaseWitQuestionAndAnswers();
+      if (posts) {
+        const successData = {
+          status: 200,
+          data: JSON.stringify({ qna: posts }),
+          error: null,
+          errorMessage: null,
+          successMessage: 'success',
+        };
+        console.log('runMigrations successData', successData);
+  
+        return successData;
+      }
+      return null;
+    }
+
   @Get('exhibitsFolder/:fileId')
   async serveOfferItemImage(@Param('fileId') fileId, @Res() res): Promise<any> {
     res.sendFile(fileId, { root: './uploadedFiles/exhibitsFolder' });
