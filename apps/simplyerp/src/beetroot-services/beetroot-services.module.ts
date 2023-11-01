@@ -22,6 +22,7 @@ import { QuestionService } from './question-service';
 import { Editor } from './entities/beetroot-service.entity';
 import { Exhibit, Dialogue, QuestionAnswer, Responses } from './entities/exhibit.entity';
 import { BeetrootServicesController } from './beetroot-services.controller';
+import { MigrationService } from './migration-service';
 
 @Module({
   imports: [
@@ -56,6 +57,7 @@ import { BeetrootServicesController } from './beetroot-services.controller';
     SocketService,
     UsersService,
     // SearchService,
+    MigrationService,
     JwtService,
     UserWalletsService,
     SalesOrdersService,

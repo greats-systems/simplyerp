@@ -25,11 +25,34 @@ import {
   QuestionnaireSection,
 } from './entities/questionaire.entity';
 import { ExhibitService } from './exhibit-service';
+import { MigrationService } from './migration-service';
 
 @Controller('beetroot')
 export class BeetrootServicesController {
-  constructor(private readonly questionService: QuestionService,     private readonly exhibitServiceService: ExhibitService,
+  constructor(
+    private readonly questionService: QuestionService,     
+    private readonly exhibitServiceService: ExhibitService,
+    private readonly migrationService: MigrationService,
     ) {}
+
+    @Get('run-migrations')
+    async runMigrations() {
+      console.log('getPosts');
+      const posts = await this.migrationService.createQuestionAndAnswers();
+      if (posts) {
+        const successData = {
+          status: 200,
+          data: JSON.stringify({ qna: posts }),
+          error: null,
+          errorMessage: null,
+          successMessage: 'success',
+        };
+        console.log('getQuestionnaires successData', successData);
+  
+        return successData;
+      }
+      return null;
+    }
   @Get('exhibitsFolder/:fileId')
   async serveOfferItemImage(@Param('fileId') fileId, @Res() res): Promise<any> {
     res.sendFile(fileId, { root: './uploadedFiles/exhibitsFolder' });
